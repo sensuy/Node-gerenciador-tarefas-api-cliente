@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Button, Form, Jumbotron, Modal } from 'react-bootstrap';
 import { A, navigate } from 'hookrouter';
 import Tarefa from '../models/tarefa.model';
+import axios from 'axios';
 
 
 
@@ -9,23 +10,25 @@ import Tarefa from '../models/tarefa.model';
 
 function CadastrarTarefa() {
 
+	const API_URL_CADASTRAR_TAREFA = 'http://localhost:3001/gerenciador-tarefas'
+
 	const [tarefa, setTarefa] = useState('');
 	const [formValidado, setFormValidado] = useState(false);
 	const [exibirModal, setExibirModal] = useState(false);
+	const [exibirModalErro, setExibirModalErro] = useState(false);
 
-	function cadastrar(event) {
+	async function cadastrar(event) {
 		event.preventDefault();
 		setFormValidado(true);
 		if (event.currentTarget.checkValidity()) {
+			try {
+				const novaTarefa = new Tarefa(null, tarefa, false);
+				await axios.post(API_URL_CADASTRAR_TAREFA, novaTarefa);
+				setExibirModal(true);
+			} catch (error) {
+				setExibirModalErro(true);
+			}
 
-			//Obter as tarefas
-			const tarefasDb = localStorage['tarefas'];
-			const tarefas = tarefasDb ? JSON.parse(tarefasDb) : [];
-
-			//Persistir as tarefas
-			tarefas.push(new Tarefa(new Date().getTime(), tarefa, false));
-			localStorage['tarefas'] = JSON.stringify(tarefas);
-			setExibirModal(true);
 		}
 	};
 
@@ -35,6 +38,10 @@ function CadastrarTarefa() {
 
 	function handleFecharModal() {
 		navigate('/');
+	}
+
+	function handleFecharModalErro() {
+		setExibirModalErro(false);
 	}
 
 	return (
@@ -84,6 +91,21 @@ function CadastrarTarefa() {
 						<Button variant="success"
 							onClick={handleFecharModal}>
 							Continuar
+						</Button>
+					</Modal.Footer>
+				</Modal>
+				<Modal show={exibirModalErro} onHide={handleFecharModalErro}>
+					<Modal.Header closeButton>
+						<Modal.Title>Erro</Modal.Title>
+					</Modal.Header>
+					<Modal.Body>
+						Erro ao adicionar tarefa, tente novamete em instantes.
+					</Modal.Body>
+					<Modal.Footer>
+						<Button
+							variant="warning"
+							onClick={handleFecharModalErro}>
+							Fechar
 						</Button>
 					</Modal.Footer>
 				</Modal>
