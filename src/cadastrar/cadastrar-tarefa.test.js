@@ -4,7 +4,7 @@ import CadastrarTarefa from './cadastrar-tarefa';
 import { render, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 
-describe('Teste do componente de cadastro de tarefas', () => {
+describe.skip('Teste do componente de cadastro de tarefas', () => {
 
 	it('Deve renderizar o componente sem erros', () => {
 		const div = document.createElement('div');
